@@ -10,5 +10,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-docs = [“mkdocs-material”,]
-
+# docs = ["mkdocs-material",]  # 9-30-25 I tried to do 'uv pip install -e “.[docs]”' but it said "error: Failed to parse: `“.[docs]”`
+#   Caused by: Expected package name starting with an alphanumeric character, found `“`
+# “.[docs]”
+# ^"
