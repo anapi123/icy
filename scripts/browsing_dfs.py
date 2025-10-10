@@ -5,8 +5,6 @@ import pandas as pd
 
 # RACMO: runoff, temperature, precipitation; GRACE: mass balance; Mankoff: ice discharge 
 
-
-
 def _import_file(filename: str, 
                  date_format: str, 
                  time_column_name: str) -> pd.DataFrame:
@@ -30,12 +28,37 @@ def _import_file(filename: str,
     
     return df
 
+def _format_date(df: pd.DataFrame,
+                 date_column_name: str) -> pd.DataFrame:
+    """Format an 'Year' and 'Month' column into a new column named to ex) 'Date' where the datetime format is ex) 2002-04-01, so %Y-%m-%d
+
+    Args:
+        df (pd.DataFrame): _description_
+        date_column_name (str): _description_
+
+    Returns:
+        pd.DataFrame: _description_
+    """
+    df[date_column_name] = pd.to_datetime(df[["Year", "Month"]].assign(DAY=1))
+    
+    return df
+    
 def import_grace_smb() -> pd.DataFrame:
     mass_balance_df = _import_file(
         filename="averaged_GRACE_GMB_basin_gigatons_month_mass_balance.csv",
         date_format="%Y-%b",
         time_column_name=" - Year-Month",
     )
+    
+    # Create an Year column and a Month column 
+    mass_balance_df["Year"] = mass_balance_df[" - Year-Month"].dt.year
+    mass_balance_df["Month"] = mass_balance_df[" - Year-Month"].dt.month
+    # Create final time column in %m/%d/%y format 
+    mass_balance_df["Date"] = pd.to_datetime(mass_balance_df[["Year", "Month"]].assign(DAY=1))
+    # Drop the previous - Year-month column and extra created Year and Month columns
+    mass_balance_df = mass_balance_df.drop(" - Year-Month", axis=1)
+    mass_balance_df = mass_balance_df.drop("Year", axis=1)
+    mass_balance_df = mass_balance_df.drop("Month", axis=1)
     
     return mass_balance_df
 
@@ -54,6 +77,7 @@ def import_runoff()-> pd.DataFrame:
         date_format="%Y",
         time_column_name="Year",
     )
+    # Format 
     
     return runoff_df
 
@@ -82,9 +106,7 @@ def main():
     ppt_df = import_ppt()
     temp_df = import_temp_2m()
     
-    for df in [mass_balance_df, ice_discharge_df, runoff_df, ppt_df, temp_df]:
-        print(df)
-        print("###############")
+    print(mass_balance_df)
 
 if __name__ == "__main__":
     main()
