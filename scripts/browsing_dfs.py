@@ -45,10 +45,10 @@ def _format_date(df: pd.DataFrame,
     return df
     
 def import_grace_smb() -> pd.DataFrame:
-    """Changes the original Year-Month date format into a 'Date' column in %Y-%m-%d format and sets that as the time index.
+    """Changes the original Year-Month date format into a 'Date' column in %Y-%m-%d format and sets that as the time index. Other column is 'grace_gt_month'
 
     Returns:
-        pd.DataFrame: 
+        pd.DataFrame:
     """
     mass_balance_df = _import_file(
         filename="averaged_GRACE_GMB_basin_gigatons_month_mass_balance.csv",
@@ -75,13 +75,28 @@ def import_grace_smb() -> pd.DataFrame:
     return grace_df
 
 def import_mankoff_ice_discharge() -> pd.DataFrame:
+    """Creates mini df with 'Date' column set as index in %Y-%m-%d format and other column is 'ice_discharge_gt_month'
+
+    Returns:
+        pd.DataFrame: 
+    """
     ice_discharge_df = _import_file(
         filename="Mankoff_region_D_Gt_month-1_ice_discharge_avg.csv",
         date_format="%m/%d/%y",
         time_column_name="Date",
     )
     
-    return ice_discharge_df
+    # Convert original Date column to datetime time cause it is object type rn for some reason 
+    ice_discharge_df["Date"] = pd.to_datetime(ice_discharge_df["Date"])
+    
+    # Extract date and 'AVERAGE OF SW' column
+    ice_discharge_df_mini = ice_discharge_df[["Date", "SW"]]
+    # Rename average of sw column 
+    ice_discharge_df_mini = ice_discharge_df_mini.rename(columns={"SW" : "ice_discharge_gt_month"})    
+    # Set Date column as time index
+    ice_discharge_df_mini.set_index("Date", inplace=True)
+    
+    return ice_discharge_df_mini
 
 def import_runoff()-> pd.DataFrame:
     runoff_df = _import_file(
@@ -118,7 +133,7 @@ def main():
     ppt_df = import_ppt()
     temp_df = import_temp_2m()
     
-    print(mass_balance_df)
+    print(ice_discharge_df)
 
 if __name__ == "__main__":
     main()
