@@ -3,6 +3,7 @@ import pandas as pd
 # todo get 1) temperature data in RACMO and 2) precip data in RACMO 
 # percent ice runoff versus surface discharge (see Miaja's COLAB)
 
+# I am purple (SW)
 # RACMO: runoff, temperature, precipitation; GRACE: mass balance; Mankoff: ice discharge 
 
 def _import_file(filename: str, 
@@ -33,17 +34,22 @@ def _format_date(df: pd.DataFrame,
     """Format an 'Year' and 'Month' column into a new column named to ex) 'Date' where the datetime format is ex) 2002-04-01, so %Y-%m-%d
 
     Args:
-        df (pd.DataFrame): _description_
-        date_column_name (str): _description_
+        df (pd.DataFrame): 
+        date_column_name (str): 
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: 
     """
     df[date_column_name] = pd.to_datetime(df[["Year", "Month"]].assign(DAY=1))
     
     return df
     
 def import_grace_smb() -> pd.DataFrame:
+    """Changes the original Year-Month date format into a 'Date' column in %Y-%m-%d format and sets that as the time index.
+
+    Returns:
+        pd.DataFrame: 
+    """
     mass_balance_df = _import_file(
         filename="averaged_GRACE_GMB_basin_gigatons_month_mass_balance.csv",
         date_format="%Y-%b",
@@ -53,14 +59,20 @@ def import_grace_smb() -> pd.DataFrame:
     # Create an Year column and a Month column 
     mass_balance_df["Year"] = mass_balance_df[" - Year-Month"].dt.year
     mass_balance_df["Month"] = mass_balance_df[" - Year-Month"].dt.month
-    # Create final time column in %m/%d/%y format 
+    # Create final time column in %Y-%m-%d format 
     mass_balance_df["Date"] = pd.to_datetime(mass_balance_df[["Year", "Month"]].assign(DAY=1))
     # Drop the previous - Year-month column and extra created Year and Month columns
     mass_balance_df = mass_balance_df.drop(" - Year-Month", axis=1)
     mass_balance_df = mass_balance_df.drop("Year", axis=1)
     mass_balance_df = mass_balance_df.drop("Month", axis=1)
     
-    return mass_balance_df
+    # Extract final date and my sw column into mini df and rename that sw column
+    grace_df = mass_balance_df[["Date", "AVERAGE of SW"]]
+    grace_df = grace_df.rename(columns={"AVERAGE of SW": "grace_gt_month"})
+    # Set date column as index
+    grace_df.set_index("Date", inplace=True)
+    
+    return grace_df
 
 def import_mankoff_ice_discharge() -> pd.DataFrame:
     ice_discharge_df = _import_file(
