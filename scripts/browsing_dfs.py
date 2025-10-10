@@ -1,4 +1,5 @@
 import pandas as pd 
+import matplotlib.pyplot as plt
 
 # todo get 1) temperature data in RACMO and 2) precip data in RACMO 
 # percent ice runoff versus surface discharge (see Miaja's COLAB)
@@ -7,14 +8,11 @@ import pandas as pd
 # RACMO: runoff, temperature, precipitation; GRACE: mass balance; Mankoff: ice discharge 
 
 def _import_file(filename: str, 
-                 date_format: str, 
-                 time_column_name: str) -> pd.DataFrame:
-    """Import one of the data files.
+                 **kwargs) -> pd.DataFrame:
+    """Import one of the data files - to be used for grace and ice discharge because those dfs don't have two date columns (Year and Month)
 
     Args:
-        filename (str):
-        date_format (str):
-        time_column_name (str):
+        filename (str): 
 
     Returns:
         pd.DataFrame: 
@@ -23,12 +21,12 @@ def _import_file(filename: str,
         f"/home/achen7/icy/data/{filename}",
         delimiter=",",
         na_values=["NaN", "NAN", "NaN", "None", "nan", "99999.9"],
-        date_format=date_format,
-        parse_dates=[time_column_name],
-    )
+        **kwargs
+        )
     
     return df
 
+    
 def _format_date(df: pd.DataFrame,
                  date_column_name: str) -> pd.DataFrame:
     """Format an 'Year' and 'Month' column into a new column named to ex) 'Date' where the datetime format is ex) 2002-04-01, so %Y-%m-%d
@@ -52,8 +50,8 @@ def import_grace_smb() -> pd.DataFrame:
     """
     mass_balance_df = _import_file(
         filename="averaged_GRACE_GMB_basin_gigatons_month_mass_balance.csv",
-        date_format="%Y-%b",
-        time_column_name=" - Year-Month",
+        date_format="%Y-%b", 
+        parse_dates=" - Year-Month",
     )
     
     # Create an Year column and a Month column 
@@ -74,6 +72,8 @@ def import_grace_smb() -> pd.DataFrame:
     
     return grace_df
 
+# Plot data 2009-2018 cause that's where the other basins have all data. # todo If I have gaps let group know
+# 10-10 I found out today I have 500 duplicated timestamps which are the NaTs so #FIXME drop the nans 
 def import_mankoff_ice_discharge() -> pd.DataFrame:
     """Creates mini df with 'Date' column set as index in %Y-%m-%d format and other column is 'ice_discharge_gt_month'
 
@@ -83,7 +83,7 @@ def import_mankoff_ice_discharge() -> pd.DataFrame:
     ice_discharge_df = _import_file(
         filename="Mankoff_region_D_Gt_month-1_ice_discharge_avg.csv",
         date_format="%m/%d/%y",
-        time_column_name="Date",
+        parse_dates="Date",
     )
     
     # Convert original Date column to datetime time cause it is object type rn for some reason 
@@ -102,8 +102,13 @@ def import_runoff()-> pd.DataFrame:
     runoff_df = _import_file(
         filename="RACMO_runoff_gigatons_per_month.csv",
         date_format="%Y",
-        time_column_name="Year",
+        parse_dates="Year",
     )
+    
+    print("runoff")
+    print(runoff_df.columns)
+    print(runoff_df["Year"])
+    print(runoff_df["Month"])
     # Format 
     
     return runoff_df
@@ -112,7 +117,7 @@ def import_ppt() -> pd.DataFrame:
     ppt_df = _import_file(
         filename="RACMOdataset_monthly_PRECIP_sum_(Gt).csv",
         date_format="%Y",
-        time_column_name="Year",
+        parse_dates="Year",
     )
 
     return ppt_df
@@ -121,7 +126,7 @@ def import_temp_2m() -> pd.DataFrame:
     temp_df = _import_file(
         filename="RACMOdataset_monthly_T(air 2m above surface)_avg_(K).csv",
         date_format="%Y",
-        time_column_name="Year",
+        parse_dates="Year",
     )
 
     return temp_df
@@ -133,7 +138,8 @@ def main():
     ppt_df = import_ppt()
     temp_df = import_temp_2m()
     
-    print(ice_discharge_df)
+    print(mass_balance_df)
+    
 
 if __name__ == "__main__":
     main()
