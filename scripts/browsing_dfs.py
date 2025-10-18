@@ -197,9 +197,15 @@ def concat_dfs() -> pd.DataFrame:
     ppt_df = import_ppt()
     temp_df = import_temp_2m()
 
-    concat_df = pd.concat((df for df in [mass_balance_df, ice_discharge_df, runoff_df, ppt_df, temp_df]), axis=1)
+    dfs = [mass_balance_df, ice_discharge_df, runoff_df, ppt_df, temp_df]
+    for i, df in enumerate(dfs):
+        df = df.dropna()
+        dfs[i] = df  # Store cleaned df back to list 
+
+    concat_df = pd.concat(dfs, axis=1)
     
     return concat_df
+    
 
 def main():
     concat_df = concat_dfs()
