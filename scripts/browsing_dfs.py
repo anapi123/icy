@@ -191,6 +191,12 @@ def import_temp_2m() -> pd.DataFrame:
 
 
 def concat_dfs() -> pd.DataFrame:
+    """Imports all dfs and drops the nans, as to which pd.concat works.
+
+    Returns:
+        pd.DataFrame: Concatted df with all current columns ['sw_grace_gt_month', 'sw_avg_ice_disch_gt_month', 'sw_runoff_gt_month',
+       'sw_sum_ppt_gt_each_month', 'sw_monthly_avg_temp_2m']
+    """
     mass_balance_df = import_grace_smb()
     ice_discharge_df = import_mankoff_ice_discharge()
     runoff_df = import_runoff()
@@ -209,7 +215,7 @@ def concat_dfs() -> pd.DataFrame:
 
 def main():
     concat_df = concat_dfs()
-    print(concat_df)
+    print(concat_df.columns)
 
 
 if __name__ == "__main__":
