@@ -211,11 +211,10 @@ def concat_dfs() -> pd.DataFrame:
     concat_df = pd.concat(dfs, axis=1)
     
     return concat_df
-    
+
 
 def main():
-    concat_df = concat_dfs()
-    print(concat_df.columns)
+    pass
 
 
 if __name__ == "__main__":
