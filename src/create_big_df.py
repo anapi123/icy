@@ -28,17 +28,16 @@ def _import_file(filename: str, date_format: str, **kwargs) -> pd.DataFrame:
     return df
 
 
-def _format_date(df: pd.DataFrame, date_column_name: str) -> pd.DataFrame:
-    """Format an 'Year' and 'Month' column into a new column named to ex) 'Date' where the datetime format is ex) 2002-04-01, so %Y-%m-%d
+def _format_date(df: pd.DataFrame) -> pd.DataFrame:
+    """Format an 'Year' and 'Month' column into a new column named to 'Date_new' where the datetime format is ex) 2002-04-01, so %Y-%m-%d
 
     Args:
         df (pd.DataFrame):
-        date_column_name (str):
 
     Returns:
         pd.DataFrame:
     """
-    df[date_column_name] = pd.to_datetime(df[["Year", "Month"]].assign(DAY=1))
+    df["Date_new"] = pd.to_datetime(df[["Year", "Month"]].assign(DAY=1))
 
     return df
 
@@ -81,8 +80,7 @@ def import_grace_smb() -> pd.DataFrame:
     mass_balance_df["Year"] = mass_balance_df[" - Year-Month"].dt.year
     mass_balance_df["Month"] = mass_balance_df[" - Year-Month"].dt.month
     # Create final time column in %Y-%m-%d format
-    mass_balance_df = _format_date(df=mass_balance_df,
-                                   date_column_name="Date")
+    mass_balance_df = _format_date(df=mass_balance_df)
     # Drop the previous - Year-month column and extra created Year and Month columns
     mass_balance_df = mass_balance_df.drop(" - Year-Month", axis=1)
     mass_balance_df = mass_balance_df.drop("Year", axis=1)
@@ -90,7 +88,7 @@ def import_grace_smb() -> pd.DataFrame:
 
     grace_df = _smol_df(
         df=mass_balance_df,
-        date_column_name="Date",
+        date_column_name="Date_new",
         measurement_column="AVERAGE of SW",
         renamed_column="sw_grace_gt_month",
     )
@@ -134,11 +132,10 @@ def import_runoff() -> pd.DataFrame:
         date_format="%Y",
     )
 
-    runoff_df = _format_date(df=runoff_df,
-                             date_column_name="Date")
+    runoff_df = _format_date(df=runoff_df)
     
     runoff_df_mini = _smol_df(df=runoff_df,
-                              date_column_name="Date",
+                              date_column_name="Date_new",
                               measurement_column="SW",
                               renamed_column="sw_runoff_gt_month")
     
@@ -156,11 +153,10 @@ def import_ppt() -> pd.DataFrame:
         date_format="%Y"
     )
     
-    ppt_df = _format_date(df=ppt_df, 
-                          date_column_name="Date")
+    ppt_df = _format_date(df=ppt_df)
     ppt_df_mini = _smol_df(
         df=ppt_df,
-        date_column_name="Date",
+        date_column_name="Date_new",
         measurement_column="SW",
         renamed_column="sw_sum_ppt_gt_each_month",
     )
@@ -179,10 +175,10 @@ def import_temp_2m() -> pd.DataFrame:
         date_format="%Y"
     )
     
-    temp_df = _format_date(df=temp_df, date_column_name="Date")
+    temp_df = _format_date(df=temp_df)
     temp_df_mini = _smol_df(
         df=temp_df,
-        date_column_name="Date",
+        date_column_name="Date_new",
         measurement_column="SW",
         renamed_column="sw_monthly_avg_temp_2m",
     )
@@ -214,7 +210,8 @@ def concat_dfs() -> pd.DataFrame:
 
 
 def main():
-    pass
+    concat_df = concat_dfs()
+    print(concat_df)
 
 
 if __name__ == "__main__":
