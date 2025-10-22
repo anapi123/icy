@@ -96,8 +96,7 @@ def import_grace_smb() -> pd.DataFrame:
     return grace_df
 
 
-# Plot data 2009-2018 cause that's where the other basins have all data. # todo If I have gaps let group know
-# 10-10 I found out today I have 500 duplicated timestamps which are the NaTs so #FIXME drop the nans
+# Plot data 2009-2018 cause that's where the other basins have all data
 def import_mankoff_ice_discharge() -> pd.DataFrame:
     """Creates mini df with 'Date' column set as index in %Y-%m-%d format and other column is "sw_avg_ice_disch_gt_month"
 
@@ -180,7 +179,7 @@ def import_temp_2m() -> pd.DataFrame:
         df=temp_df,
         date_column_name="Date_new",
         measurement_column="SW",
-        renamed_column="sw_monthly_avg_temp_2m",
+        renamed_column="sw_monthly_avg_temp_2m_K",
     )
 
     return temp_df_mini
@@ -191,7 +190,7 @@ def concat_dfs() -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: Concatted df with all current columns ['sw_grace_gt_month', 'sw_avg_ice_disch_gt_month', 'sw_runoff_gt_month',
-       'sw_sum_ppt_gt_each_month', 'sw_monthly_avg_temp_2m']
+       'sw_sum_ppt_gt_each_month', 'sw_monthly_avg_temp_2m_K']
     """
     mass_balance_df = import_grace_smb()
     ice_discharge_df = import_mankoff_ice_discharge()
@@ -208,6 +207,30 @@ def concat_dfs() -> pd.DataFrame:
     
     return concat_df
 
+def debug():
+    mass_balance_df = import_grace_smb()
+    ice_discharge_df = import_mankoff_ice_discharge()
+    runoff_df = import_runoff()
+    ppt_df = import_ppt()
+    temp_df = import_temp_2m()
+
+    # after you import each df (mass_balance_df, ice_discharge_df, etc.)
+    for name, df in [
+        ("grace", mass_balance_df),
+        ("ice", ice_discharge_df),
+        ("runoff", runoff_df),
+        ("ppt", ppt_df),
+        ("temp", temp_df),
+    ]:
+        print(f"\n{name}:")
+        print(" index dtype:", type(df.index), getattr(df.index, "dtype", None))
+        print(" index is DatetimeIndex?", isinstance(df.index, pd.DatetimeIndex))
+        print(" min, max:", df.index.min(), df.index.max())
+        print(" length:", len(df))
+        print(" num NaT in index:", df.index.isna().sum())
+        print(" num duplicate index values:", df.index.duplicated().sum())
+        print(df.index[:5])
+
 
 def main():
     concat_df = concat_dfs()
@@ -216,3 +239,71 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# 10-21 findings
+# ice discharge df has duplicate index values 
+# DatetimeIndex(['2000-09-01', '2007-09-01', '2008-06-01', '2008-08-01',
+#                '2008-09-01', '2008-11-01', '2009-01-01', '2009-02-01',
+#                '2009-03-01', '2009-04-01',
+#                ...
+#                '2024-11-01', '2024-12-01', '2025-01-01', '2025-02-01',
+#                '2025-03-01', '2025-04-01', '2025-05-01', '2025-06-01',
+#                '2025-07-01', '2025-08-01'],
+#               dtype='datetime64[ns]', name='Date', length=204, freq=None)
+
+
+# grace:
+#  index dtype: <class 'pandas.core.indexes.datetimes.DatetimeIndex'> datetime64[ns]
+#  index is DatetimeIndex? True
+#  min, max: 2002-04-01 00:00:00 2024-05-01 00:00:00
+#  length: 230
+#  num NaT in index: 0
+#  num duplicate index values: 0
+# DatetimeIndex(['2002-04-01', '2002-05-01', '2002-08-01', '2002-09-01',
+#                '2002-10-01'],
+#               dtype='datetime64[ns]', name='Date_new', freq=None)
+
+# ice:
+#  index dtype: <class 'pandas.core.indexes.datetimes.DatetimeIndex'> datetime64[ns]
+#  index is DatetimeIndex? True
+#  min, max: 1986-04-15 00:00:00 2025-08-20 00:00:00
+#  length: 3426
+#  num NaT in index: 501
+#  num duplicate index values: 500
+# DatetimeIndex(['1986-04-15', '1986-05-15', '1986-06-15', '1986-07-15',
+#                '1986-08-15'],
+#               dtype='datetime64[ns]', name='Date', freq=None)
+
+# runoff:
+#  index dtype: <class 'pandas.core.indexes.datetimes.DatetimeIndex'> datetime64[ns]
+#  index is DatetimeIndex? True
+#  min, max: 2000-09-01 00:00:00 2018-12-01 00:00:00
+#  length: 999
+#  num NaT in index: 779
+#  num duplicate index values: 778
+# DatetimeIndex(['2000-09-01', '2000-10-01', '2000-11-01', '2000-12-01',
+#                '2001-01-01'],
+#               dtype='datetime64[ns]', name='Date_new', freq=None)
+
+# ppt:
+#  index dtype: <class 'pandas.core.indexes.datetimes.DatetimeIndex'> datetime64[ns]
+#  index is DatetimeIndex? True
+#  min, max: 2000-09-01 00:00:00 2018-12-01 00:00:00
+#  length: 220
+#  num NaT in index: 0
+#  num duplicate index values: 0
+# DatetimeIndex(['2000-09-01', '2000-10-01', '2000-11-01', '2000-12-01',
+#                '2001-01-01'],
+#               dtype='datetime64[ns]', name='Date_new', freq=None)
+
+# temp:
+#  index dtype: <class 'pandas.core.indexes.datetimes.DatetimeIndex'> datetime64[ns]
+#  index is DatetimeIndex? True
+#  min, max: 2000-09-01 00:00:00 2018-12-01 00:00:00
+#  length: 220
+#  num NaT in index: 0
+#  num duplicate index values: 0
+# DatetimeIndex(['2000-09-01', '2000-10-01', '2000-11-01', '2000-12-01',
+#                '2001-01-01'],
+#               dtype='datetime64[ns]', name='Date_new', freq=None)

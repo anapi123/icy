@@ -1,5 +1,7 @@
 
-def fontsize_style() -> dict[str, str]:
+from typing import Any 
+
+def fontsize_style() -> dict[str, Any]:  # used Any instead of str to avoid error in script...
     """Dict with fontsize and fontweight options: meant to be unpacken in plt call.
 
     Returns:
@@ -10,12 +12,17 @@ def fontsize_style() -> dict[str, str]:
     return fontsize
 
 
-def line_style() -> dict[str, str]:
-    """The thickness and color of the plotted line. Unpack in plt call.
+def scatter_style() -> dict[str, float | str]:
+    """Unpack in plt.scatter() - stylizes scatter points
 
     Returns:
-        dict[str, str]:
+        dict[str, float | str]:
     """
-    linestyle = {"linewidth": 4, "c": "#90ff63"}
-
-    return linestyle
+    style = {
+        "s": 100,
+        "edgecolor": "#d90b0b",
+        "linewidth": 0.05,
+        "c": "#90ff63",
+        "alpha": 0.8
+    }
+    return style
