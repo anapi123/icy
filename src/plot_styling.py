@@ -18,11 +18,5 @@ def scatter_style() -> dict[str, float | str]:
     Returns:
         dict[str, float | str]:
     """
-    style = {
-        "s": 100,
-        "edgecolor": "#d90b0b",
-        "linewidth": 0.05,
-        "c": "#90ff63",
-        "alpha": 0.8
-    }
+    style = {"s": 100, "edgecolor": "white", "linewidth": 0.01, "c": "#ffa95e"}
     return style

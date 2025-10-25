@@ -28,7 +28,7 @@ def _plot_scatter(axes: Axes,
 
 def main():
     
-    plt.style.use("grayscale")
+    plt.style.use("dark_background")
     
     #  'sw_avg_ice_disch_gt_month', 'sw_runoff_gt_month', 'sw_sum_ppt_gt_each_month', 'sw_monthly_avg_temp_2m'
     dfs = concat_dfs()
@@ -65,9 +65,13 @@ def main():
     
     # Rotate date ticks 90 degrees for ax3 and ax4
     for ax in [ax3, ax4]:
-        ax.tick_params(axis="x", labelrotation=90)
+        ax.tick_params(axis="x", 
+                       labelrotation=90)
+        for tick in ax.get_xticklabels():
+            tick.set_fontweight('bold')
     for ax in axes:
         thic_plot(ax)
+
 
     plt.subplots_adjust(left=0.117,
                         bottom=0.126,
