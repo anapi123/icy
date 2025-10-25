@@ -1,12 +1,13 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# todo get 1) temperature data in RACMO and 2) precip data in RACMO
 # percent ice runoff versus surface discharge (see Miaja's COLAB)
 
 # I am purple (SW)
 # RACMO: runoff, temperature, precipitation; GRACE: mass balance; Mankoff: ice discharge
 
+# grace = following data minus the previous year 
+# calculated mass balance - grace , summed by year (group by year. sum())
+# calculated mass balance = 
 
 def _import_file(filename: str, date_format: str, **kwargs) -> pd.DataFrame:
     """Import one of the data files - to be used for grace and ice discharge because those dfs don't have two date columns (Year and Month)
@@ -92,6 +93,9 @@ def import_grace_smb() -> pd.DataFrame:
         measurement_column="AVERAGE of SW",
         renamed_column="sw_grace_gt_month",
     )
+    
+    # subtract the following value from next row from the current value
+    grace_df["sw_grace_diff_gt_month"] = grace_df.diff()
 
     return grace_df
 
@@ -183,7 +187,7 @@ def import_temp_2m() -> pd.DataFrame:
     )
 
     return temp_df_mini
-
+    
 
 def concat_dfs() -> pd.DataFrame:
     """Imports all dfs and drops the nans, as to which pd.concat works.
