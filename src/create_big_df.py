@@ -66,7 +66,7 @@ def _smol_df(df: pd.DataFrame,
     
     
 def import_grace_smb() -> pd.DataFrame:
-    """Changes the original Year-Month date format into a 'Date' column in %Y-%m-%d format and sets that as the time index. Other column is 'grace_gt_month'
+    """Changes the original Year-Month date format into a 'Date' column in %Y-%m-%d format and sets that as the time index. Other column is 'sw_grace_gt_month'
 
     Returns:
         pd.DataFrame:
@@ -201,44 +201,58 @@ def concat_dfs() -> pd.DataFrame:
     runoff_df = import_runoff()
     ppt_df = import_ppt()
     temp_df = import_temp_2m()
-
-    dfs = [mass_balance_df, ice_discharge_df, runoff_df, ppt_df, temp_df]
-    for i, df in enumerate(dfs):
-        df = df.dropna()
-        dfs[i] = df  # Store cleaned df back to list 
-
-    concat_df = pd.concat(dfs, axis=1)
     
+    dfs = {
+        "mass_balance": mass_balance_df,
+        "ice": ice_discharge_df,
+        "runoff": runoff_df,
+        "ppt": ppt_df,
+        "temp": temp_df
+    }
+    for key, df in dfs.items():
+        dfs[key] = df.dropna()  # Drop nans in each df
+
+
+    concat_df = pd.concat(dfs.values(), axis=1)
+    
+    print("NaT count in final index:", concat_df.index.isna().sum())
+    print("Is index monotonic?", concat_df.index.is_monotonic_increasing)
+    print("Index dtype:", concat_df.index.dtype)
+
     return concat_df
+    
 
-def debug():
-    mass_balance_df = import_grace_smb()
-    ice_discharge_df = import_mankoff_ice_discharge()
-    runoff_df = import_runoff()
-    ppt_df = import_ppt()
-    temp_df = import_temp_2m()
+    # # Drop duplicate indices from each DataFrame
+    # for name, df in dfs.items():
+    #     if not df.index.is_unique:
+    #         dup_count = df.index.duplicated().sum()
+    #         print(f"{name}: {dup_count} duplicate index values removed")
+    #         dfs[name] = df[~df.index.duplicated(keep="first")]
 
-    # after you import each df (mass_balance_df, ice_discharge_df, etc.)
-    for name, df in [
-        ("grace", mass_balance_df),
-        ("ice", ice_discharge_df),
-        ("runoff", runoff_df),
-        ("ppt", ppt_df),
-        ("temp", temp_df),
-    ]:
-        print(f"\n{name}:")
-        print(" index dtype:", type(df.index), getattr(df.index, "dtype", None))
-        print(" index is DatetimeIndex?", isinstance(df.index, pd.DatetimeIndex))
-        print(" min, max:", df.index.min(), df.index.max())
-        print(" length:", len(df))
-        print(" num NaT in index:", df.index.isna().sum())
-        print(" num duplicate index values:", df.index.duplicated().sum())
-        print(df.index[:5])
+    # concat_df = pd.concat(dfs.values(), axis=1)
+    
+    # # Remove NaTs
+    # concat_df = concat_df[~concat_df.index.isna()]
+
+    # # Make time monotonic 
+    # concat_df = concat_df.sort_index()
+    
+
+
+def slice_big_df() -> pd.DataFrame:
+    """Slice to 2009-2018 period.
+
+    Returns:
+        pd.DataFrame:
+    """
+    sliced_df = concat_dfs().loc["2009-01-01":"2018-12-31"]
+
+    return sliced_df
 
 
 def main():
     concat_df = concat_dfs()
-    print(concat_df)
+    #print(concat_df)
 
 
 if __name__ == "__main__":
