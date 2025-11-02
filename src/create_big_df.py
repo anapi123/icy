@@ -251,8 +251,8 @@ def slice_big_df() -> pd.DataFrame:
 
 
 def main():
-    concat_df = concat_dfs()
-    #print(concat_df)
+    sliced_df = slice_big_df()
+    print(sliced_df[["sw_avg_ice_disch_gt_month", "sw_runoff_gt_month"]])
 
 
 if __name__ == "__main__":
