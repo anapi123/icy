@@ -9,7 +9,7 @@ import pandas as pd
 # calculated mass balance - grace , summed by year (group by year. sum())
 # calculated mass balance = 
 
-def _import_file(filename: str, date_format: str, **kwargs) -> pd.DataFrame:
+def import_file(filename: str, date_format: str, **kwargs) -> pd.DataFrame:
     """Import one of the data files - to be used for grace and ice discharge because those dfs don't have two date columns (Year and Month)
 
     Args:
@@ -71,7 +71,7 @@ def import_grace_smb() -> pd.DataFrame:
     Returns:
         pd.DataFrame:
     """
-    mass_balance_df = _import_file(
+    mass_balance_df = import_file(
         filename="averaged_GRACE_GMB_basin_gigatons_month_mass_balance.csv",
         date_format="%Y-%b",
         parse_dates=[" - Year-Month"],
@@ -107,7 +107,7 @@ def import_mankoff_ice_discharge() -> pd.DataFrame:
     Returns:
         pd.DataFrame:
     """
-    ice_discharge_df = _import_file(
+    ice_discharge_df = import_file(
         filename="Mankoff_region_D_Gt_month-1_ice_discharge_avg.csv",
         date_format="%m/%d/%y",
         parse_dates=["Date"],
@@ -130,7 +130,7 @@ def import_runoff() -> pd.DataFrame:
     Returns:
         pd.DataFrame:
     """
-    runoff_df = _import_file(
+    runoff_df = import_file(
         filename="RACMO_runoff_gigatons_per_month.csv",
         date_format="%Y",
     )
@@ -151,7 +151,7 @@ def import_ppt() -> pd.DataFrame:
     Returns:
         pd.DataFrame: 
     """
-    ppt_df = _import_file(
+    ppt_df = import_file(
         filename="RACMOdataset_monthly_PRECIP_sum_(Gt).csv",
         date_format="%Y"
     )
@@ -173,7 +173,7 @@ def import_temp_2m() -> pd.DataFrame:
     Returns:
         pd.DataFrame:
     """
-    temp_df = _import_file(
+    temp_df = import_file(
         filename="RACMOdataset_monthly_T(air 2m above surface)_avg_(K).csv",
         date_format="%Y"
     )
