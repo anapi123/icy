@@ -68,7 +68,7 @@ def plot_total_loss():
         )
     legend = ax.legend(fontsize=15)
     
-    ax.set_ylabel("Total Loss GrIS / (Mt $\\cdot$ month$^{-1} \\cdot km^{2}$))", **fontstyle)
+    ax.set_ylabel("Total Loss GrIS / (Mt $\\cdot$ month$^{-1} \\cdot km^{-2}$))", **fontstyle)
     ax.set_xlabel("Datetime", **fontstyle)
     thic_plot(ax)
 
