@@ -1,4 +1,4 @@
-,sw_grace_gt_month,sw_grace_diff_gt_month,sw_avg_ice_disch_gt_month,sw_runoff_gt_month,sw_sum_ppt_gt_each_month,sw_monthly_avg_temp_2m_K,sw_total_ice_loss_gt_month,sw_ice_discharge_percent,sw_grace_diffs_gt_month
+Date,sw_grace_gt_month,sw_grace_diff_gt_month,sw_avg_ice_disch_gt_month,sw_runoff_gt_month,sw_sum_ppt_gt_each_month,sw_monthly_avg_temp_2m_K,sw_total_ice_loss_gt_month,sw_ice_discharge_percent,sw_grace_diffs_gt_month
 2009-01-31,215.0,78.0,1.6117628815,0.084670573,3.98366227,252.4179159,-1.6964334545,95.00890690551988,-75.7127711845
 2009-02-28,191.0,-24.0,1.4594225319166665,0.066331881,3.217816942,250.8445241,-1.5257544129166665,95.6525191447293,25.692062529083334
 2009-03-31,190.0,-1.0,1.6212689935,0.063233942,4.451839355,248.1550624,-1.6845029355,96.24613643185901,3.7673364194999994
