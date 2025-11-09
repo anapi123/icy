@@ -20,3 +20,13 @@ def scatter_style() -> dict[str, float | str]:
     """
     style = {"s": 100, "edgecolor": "white", "linewidth": 0.01, "c": "#ffa95e"}
     return style
+
+def line_style() -> dict[str, float | str]:
+    """Unpack in line plotting call
+
+    Returns:
+        dict[str, float | str]: 
+    """
+    style = {"color": "#8d5fa8",
+             "linewidth": 3}
+    return style
